@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+            integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.min.js"></script>
+    <style>
+        #response {
+            border: 1px solid black;
+            width: 500px;
+            min-height: 300px;
+        }
+
+        .msg {
+            background-color: antiquewhite;
+            padding: 3px;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+<input type="text" id="username" th:value="${username!=null}?${username}:'default_user'">
+<div>
+    <input type="button" value="active" id="activate">
+    <input type="button" value="deactive" id="deactivate">
+</div>
+<div>
+    <input type="text" id="subscribe_destination" th:value="${'/user/queue/position-updates'}">
+    <input type="button" value="subscribe" id="subscribe">
+    <input type="button" value="subscribe" id="unsubscribe">
+</div>
+<div>
+    <input type="text" id="publish_destination" th:value="${'/app/greeting3'}">
+    <input type="text" id="msg">
+    <input type="button" value="publish" id="publish">
+</div>
+<div id="response">
+    <!--    <div class="msg"></div>-->
+</div>
+<script>
+    let client, subscription;
+
+    let show_msg = function (msg) {
+        let html = `<div class="msg">response: ${msg}</div>`;
+        $("#response").append(html);
+    }
+
+    let callback = function (message) {
+        if (message.body) {
+            show_msg('got message with body ' + message.body);
+        } else {
+            show_msg('got empty message');
+        }
+    };
+    let subscribe = function (destination) {
+        const headers = {ack: 'client'};
+        subscription = client.subscribe(destination, callback);
+    }
+    let unsubscribe = function () {
+        subscription.unsubscribe();
+    }
+
+    let publish = function () {
+        let destination = $("#publish_destination").val();
+        let msg = $("#msg").val();
+        client.publish({destination: destination, body: msg, headers: {priority: '9'}});
+    }
+
+    $(function () {
+        client = new StompJs.Client({
+            brokerURL: 'ws://localhost:8080/portfolio?token=df12sda&username='+$("#username").val(),
+            connectHeaders: {
+                login: 'user',
+                passcode: 'password',
+                username: $("#username").val(),
+            },
+            debug: function (str) {
+                console.log("debug:", str);
+            },
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+        });
+
+        client.onConnect = function (frame) {
+            console.log(JSON.stringify(frame));
+        };
+
+        client.onStompError = function (frame) {
+            console.log('Broker reported error: ' + frame.headers['message']);
+            console.log('Additional details: ' + frame.body);
+        };
+
+        $("#publish").on('click', function () {
+            publish();
+        });
+        $("#activate").on('click', function () {
+            client.activate();
+        })
+        $("#deactivate").on('click', function () {
+            client.deactivate();
+        })
+        $("#subscribe").on('click', function () {
+            subscribe($("#subscribe_destination").val())
+        });
+        $("#unsubscribe").on('click', function () {
+            unsubscribe()
+        });
+    });
+</script>
+</body>
+</html>
