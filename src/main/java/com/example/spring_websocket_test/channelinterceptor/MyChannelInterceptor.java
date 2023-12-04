@@ -13,6 +13,7 @@ public class MyChannelInterceptor implements ChannelInterceptor {
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.wrap(message);
         SimpMessageType messageType = accessor.getMessageType();
         if (messageType == SimpMessageType.CONNECT) {
+            System.out.println("preSend");
         }
         return message;
     }

@@ -15,6 +15,7 @@ public class MyCustomHandshakeHandler extends DefaultHandshakeHandler {
     protected Principal determineUser(ServerHttpRequest request,
                                       WebSocketHandler wsHandler,
                                       Map<String, Object> attributes) {
+        System.out.println("determineUser");
         // 实现您的用户身份认证逻辑
         // 返回一个实现了 Principal 接口的对象
         URI uri = request.getURI();
