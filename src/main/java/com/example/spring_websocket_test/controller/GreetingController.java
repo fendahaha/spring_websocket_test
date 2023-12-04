@@ -46,9 +46,11 @@ public class GreetingController {
     }
 
     @RequestMapping(path = "/greetings", method = POST)
-    public void greet(String greeting) {
+    @ResponseBody
+    public String greet(String greeting) {
         String text = "[" + getTimestamp() + "]:" + greeting;
         this.template.convertAndSend("/topic/greetings", text);
+        return "ok";
     }
 
     @MessageMapping("/greeting")

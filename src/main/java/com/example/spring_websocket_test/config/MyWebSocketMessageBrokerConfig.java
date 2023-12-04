@@ -16,7 +16,8 @@ public class MyWebSocketMessageBrokerConfig implements WebSocketMessageBrokerCon
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/portfolio")
                 .addInterceptors(new MyHandshakeInterceptor2())
-                .setHandshakeHandler(new MyCustomHandshakeHandler());
+                .setHandshakeHandler(new MyCustomHandshakeHandler())
+                .setAllowedOriginPatterns("http://localhost:[*]", "http://127.0.0.1:[*]");
     }
 
     @Override
