@@ -19,7 +19,7 @@ public class MyHandshakeInterceptor2 implements HandshakeInterceptor {
 //        System.out.println("beforeHandshake");
 //        URI uri = request.getURI();
 //        System.out.println(uri);
-//        attributes.put("my_user_name", "fenda");
+        attributes.put("my_user_name", "fenda");
         return true;
     }
 
